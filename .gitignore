@@ -17,5 +17,9 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# Goland projects files
+.idea/
+.DS_Store
+
 # Go workspace file
 go.work
