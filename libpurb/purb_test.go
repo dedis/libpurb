@@ -1,4 +1,4 @@
-package purb
+package libpurb
 
 import (
 	"log"
@@ -84,7 +84,7 @@ func TestEncodeDecode(t *testing.T) {
 			blob := purb.ToBytes()
 
 			// print for fun
-			//log.Println(purb.visualRepresentation(true))
+			//log.Println(libpurb.visualRepresentation(true))
 
 			// try decode
 			for recipientsID := 0; recipientsID < nRecipients; recipientsID++ {
@@ -135,7 +135,7 @@ func TestEncodeDecodeSimplified(t *testing.T) {
 			blob := purb.ToBytes()
 
 			// print for fun
-			//log.Println(purb.visualRepresentation(true))
+			//log.Println(libpurb.visualRepresentation(true))
 
 			// try decode
 			for recipientsID := 0; recipientsID < nRecipients; recipientsID++ {

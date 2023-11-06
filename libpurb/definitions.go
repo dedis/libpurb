@@ -1,4 +1,4 @@
-package purb
+package libpurb
 
 import (
 	"go.dedis.ch/kyber/v3"
@@ -33,13 +33,13 @@ type Suite interface {
 }
 
 // A map of suite->info, info being the length of a marshalled public key,
-// and the Allowed Positions in the purb header
+// and the Allowed Positions in the libpurb header
 type SuiteInfoMap map[string]*SuiteInfo
 
 // SuiteInfo holds possible positions whose cornerstones might take in a header
 // and a SessionKey length for this suite
 type SuiteInfo struct {
-	// alternative SessionKey/point position in purb header
+	// alternative SessionKey/point position in libpurb header
 	AllowedPositions []int
 	// length of each SessionKey/point in bytes
 	CornerstoneLength int
@@ -47,7 +47,7 @@ type SuiteInfo struct {
 	EntryPointLength int
 }
 
-// Structure defining the actual header of a purb
+// Structure defining the actual header of a libpurb
 type Header struct {
 	// map of suiteName -> []entrypoints
 	EntryPoints map[string][]*EntryPoint

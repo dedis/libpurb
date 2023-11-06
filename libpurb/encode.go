@@ -1,15 +1,15 @@
-package purb
+package libpurb
 
 import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/binary"
-	"purb"
 	"sort"
 	"strconv"
 
 	"go.dedis.ch/kyber/v3/util/key"
 	"go.dedis.ch/kyber/v3/util/random"
+	"go.dedis.ch/libpurb"
 )
 
 // Creates a PURB from some data and Recipients information
@@ -22,11 +22,11 @@ func (p *Purb) Encode(
 	p.nonce = p.randomBytes(NonceLength)
 	p.sessionKey = p.randomBytes(SymmetricKeyLength)
 
-	purb.Logger.Info().Msgf("Created an empty PURB, original data %v, payload key %v, nonce %v",
+	libpurb.Logger.Info().Msgf("Created an empty PURB, original data %v, payload key %v, nonce %v",
 		data, p.sessionKey, p.nonce)
-	purb.Logger.Debug().Msgf("Recipients %+v", p.Recipients)
+	libpurb.Logger.Debug().Msgf("Recipients %+v", p.Recipients)
 	for i := range p.config.suiteInfoMap {
-		purb.Logger.Debug().Msgf("SuiteInfoMap [%v]: len %v, positions %+v", i,
+		libpurb.Logger.Debug().Msgf("SuiteInfoMap [%v]: len %v, positions %+v", i,
 			p.config.suiteInfoMap[i].CornerstoneLength,
 			p.config.suiteInfoMap[i].AllowedPositions)
 	}
@@ -40,7 +40,7 @@ func (p *Purb) Encode(
 	// converts everything to []byte, performs the XOR trick on the cornerstones
 	p.placePayloadAndCornerstones()
 
-	// computes and appends HMAC to a byte representation of a full purb
+	// computes and appends HMAC to a byte representation of a full libpurb
 	p.addMAC()
 
 	return nil
@@ -92,7 +92,7 @@ func (p *Purb) createCornerstones() {
 			}
 
 			if keyPair.Hiding.HideLen() > p.config.suiteInfoMap[recipient.SuiteName].CornerstoneLength {
-				purb.Logger.Fatal().Msgf("Length of an Elligator-encoded public key is not what we expect. It's %v",
+				libpurb.Logger.Fatal().Msgf("Length of an Elligator-encoded public key is not what we expect. It's %v",
 					keyPair.Hiding.HideLen())
 			}
 
@@ -104,7 +104,7 @@ func (p *Purb) createCornerstones() {
 		cornerstone := p.newCornerStone(recipient.SuiteName, keyPair)
 		header.Cornerstones[recipient.SuiteName] = cornerstone
 
-		purb.Logger.Debug().Msgf("Created cornerstone[%v], value %v",
+		libpurb.Logger.Debug().Msgf("Created cornerstone[%v], value %v",
 			recipient.SuiteName, cornerstone.Bytes)
 	}
 }
@@ -138,7 +138,7 @@ func (p *Purb) createEntryPoints() {
 		// derive a shared secret using KDF
 		sharedSecret := KDF("", sharedBytes)
 
-		purb.Logger.Debug().Msgf("Shared secret with suite=%v, entrypoint value %v",
+		libpurb.Logger.Debug().Msgf("Shared secret with suite=%v, entrypoint value %v",
 			recipient.SuiteName,
 			sharedBytes)
 
@@ -167,9 +167,9 @@ func placeCornerstonesHelper(
 ) []*Cornerstone {
 
 	if len(cornerstonesToPlace) == 0 {
-		purb.Logger.Debug().Msgf("Placed all cornerstones!")
+		libpurb.Logger.Debug().Msgf("Placed all cornerstones!")
 		for _, c := range placedCornerstones {
-			purb.Logger.Debug().Msgf("%v between %v and %v",
+			libpurb.Logger.Debug().Msgf("%v between %v and %v",
 				c.SuiteName, c.Offset, c.EndPos)
 		}
 		return placedCornerstones
@@ -231,7 +231,7 @@ func placeCornerstonesHelper(
 			EndPos:    endBit,
 		})
 
-		purb.Logger.Debug().Msgf("Attempting position %v : %v for suite %v",
+		libpurb.Logger.Debug().Msgf("Attempting position %v : %v for suite %v",
 			startBit, endBit, cornerstone.SuiteName)
 
 		// filter the one we just placed
@@ -312,7 +312,7 @@ func (p *Purb) placeCornerstones() {
 			panic("I thought we had this position reserved")
 		}
 
-		purb.Logger.Debug().Msgf("Position for cornerstone %v is start %v, end %v",
+		libpurb.Logger.Debug().Msgf("Position for cornerstone %v is start %v, end %v",
 			cornerstone.SuiteName, cornerstone.Offset, cornerstone.EndPos)
 	}
 }
@@ -349,7 +349,7 @@ func (p *Purb) placeEntrypoints() {
 						p.header.EntryPoints[suite][entrypointID].Offset = effectiveStartPos
 						positionFound = true
 
-						purb.Logger.Debug().Msgf("Found position for entrypoint %v of suite %v, table size %v, linear %v, start %v, end %v",
+						libpurb.Logger.Debug().Msgf("Found position for entrypoint %v of suite %v, table size %v, linear %v, start %v, end %v",
 							entrypointID, suite, tableSize, j, effectiveStartPos,
 							effectiveEndPos)
 						break
@@ -384,10 +384,10 @@ func (p *Purb) placeEntrypointsSimplified() {
 					p.header.EntryPoints[suite][entryPointID].Offset = startPos
 					endPos := startPos + entrypoint.Length
 
-					purb.Logger.Debug().Msgf("Found position for entrypoint %v of suite %v, SIMPLIFIED, start %v, end %v",
+					libpurb.Logger.Debug().Msgf("Found position for entrypoint %v of suite %v, SIMPLIFIED, start %v, end %v",
 						entryPointID, suite, startPos, endPos)
 
-					//purb.Logger.Debug().Msgf("Placing entry at [%d-%d]", startPos, startPos+h.EntryPointLength)
+					//libpurb.Logger.Debug().Msgf("Placing entry at [%d-%d]", startPos, startPos+h.EntryPointLength)
 					break
 				}
 				startPos += entrypoint.Length
@@ -405,7 +405,7 @@ func (p *Purb) macOverlapsWithAllowedPositions(macStart, macEnd int) bool {
 		for _, cornerstoneStartPos := range p.config.suiteInfoMap[cornerstone.SuiteName].AllowedPositions {
 			cornerstoneEndPos := cornerstoneStartPos + cornerstoneLength
 			if macStart < cornerstoneEndPos && macEnd > cornerstoneStartPos {
-				purb.Logger.Warn().Msgf("Overlap with MAC detected: MAC from %v to %v, cornerstone from %v to %v. Going to "+
+				libpurb.Logger.Warn().Msgf("Overlap with MAC detected: MAC from %v to %v, cornerstone from %v to %v. Going to "+
 					"re-pad...", macStart, macEnd, cornerstoneStartPos, cornerstoneEndPos)
 				return true
 			}
@@ -421,7 +421,7 @@ func (p *Purb) encryptThenPadData(data []byte) {
 	payloadKey := KDF("enc", p.sessionKey)
 	encryptedData := streamEncrypt(data, payloadKey)
 	p.encryptedDataLen = len(encryptedData)
-	purb.Logger.Debug().Msgf("Payload encrypted to %v (len %v)", encryptedData,
+	libpurb.Logger.Debug().Msgf("Payload encrypted to %v (len %v)", encryptedData,
 		len(encryptedData))
 
 	p.payload = pad(encryptedData, p.header.Length()+MacAuthenticationTagLength)
@@ -434,7 +434,7 @@ func (p *Purb) encryptThenPadData(data []byte) {
 		p.payload = pad(append(p.payload, randomByte...),
 			p.header.Length()+MacAuthenticationTagLength)
 	}
-	purb.Logger.Debug().Msgf("Encrypted payload padded from %v to %v bytes",
+	libpurb.Logger.Debug().Msgf("Encrypted payload padded from %v to %v bytes",
 		len(encryptedData), len(p.payload))
 }
 
@@ -448,7 +448,7 @@ func (p *Purb) placePayloadAndCornerstones() {
 		region := buffer.growAndGetRegion(0, NonceLength)
 		copy(region, p.nonce)
 
-		purb.Logger.Debug().Msgf("Adding nonce in [%v:%v], value %v, len %v",
+		libpurb.Logger.Debug().Msgf("Adding nonce in [%v:%v], value %v, len %v",
 			0, NonceLength, p.nonce, len(p.nonce))
 
 	}
@@ -462,7 +462,7 @@ func (p *Purb) placePayloadAndCornerstones() {
 		region := buffer.growAndGetRegion(startPos, endPos)
 		copy(region, cornerstone.Bytes)
 
-		purb.Logger.Debug().Msgf("Adding cornerstone in [%v:%v], value %v, len %v", startPos,
+		libpurb.Logger.Debug().Msgf("Adding cornerstone in [%v:%v], value %v, len %v", startPos,
 			endPos,
 			cornerstone.Bytes, length)
 	}
@@ -486,11 +486,11 @@ func (p *Purb) placePayloadAndCornerstones() {
 			entrypointKey := KDF("key", entrypoint.SharedSecret)
 			encrypted, err := aeadEncrypt(entrypointContent, p.nonce, entrypointKey, nil, p.stream)
 			if err != nil {
-				purb.Logger.Fatal().Msg(err.Error())
+				libpurb.Logger.Fatal().Msg(err.Error())
 			}
 			copy(region, encrypted)
 
-			purb.Logger.Debug().Msgf("Adding symmetric entrypoint in [%v:%v], plaintext value %v, encrypted value %v with key %v, len %v",
+			libpurb.Logger.Debug().Msgf("Adding symmetric entrypoint in [%v:%v], plaintext value %v, encrypted value %v with key %v, len %v",
 				startPos, endPos, entrypointContent, region, entrypoint.SharedSecret,
 				len(entrypointContent))
 		}
@@ -501,16 +501,16 @@ func (p *Purb) placePayloadAndCornerstones() {
 		region := buffer.growAndGetRegion(low, high)
 		p.stream.XORKeyStream(region, region)
 
-		purb.Logger.Debug().Msgf("Adding random bytes in [%v:%v]", low, high)
+		libpurb.Logger.Debug().Msgf("Adding random bytes in [%v:%v]", low, high)
 	}
 	p.header.Layout.ScanFreeRegions(fillRndFunction, buffer.length())
 
-	//purb.Logger.Debug().Msgf("Final length of header: %d", len(p.buf))
-	//purb.Logger.Debug().Msgf("Random with header: %x", p.buf)
+	//libpurb.Logger.Debug().Msgf("Final length of header: %d", len(p.buf))
+	//libpurb.Logger.Debug().Msgf("Random with header: %x", p.buf)
 
 	// copy message into buffer
 
-	purb.Logger.Debug().Msgf("Adding payload in [%v:%v], value %v, len %v", buffer.length(),
+	libpurb.Logger.Debug().Msgf("Adding payload in [%v:%v], value %v, len %v", buffer.length(),
 		buffer.length()+len(p.payload), p.payload, len(p.payload))
 	buffer.append(p.payload)
 

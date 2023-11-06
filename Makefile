@@ -12,14 +12,14 @@ lint: tidy
 	golangci-lint run
 
 vet: tidy
-	go vet purb/...
+	go vet go.dedis.ch/libpurb/...
 
 test: tidy
 	# Test without coverage
 	LLVL=""
-	go test purb/...
+	go test go.dedis.ch/libpurb/...
 
 coverage: tidy
 	# Test and generate a coverage output usable by sonarcloud
 	LLVL=""
-	go test -json -covermode=count -coverpkg=purb/... -coverprofile=profile.cov purb/... | tee report.json
+	go test -json -covermode=count -coverpkg=libpurb/... -coverprofile=profile.cov go.dedis.ch/libpurb/... | tee report.json

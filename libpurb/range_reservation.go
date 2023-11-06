@@ -1,4 +1,4 @@
-package purb
+package libpurb
 
 /* Code credit to Matthew Underwood, simplified by LB */
 
