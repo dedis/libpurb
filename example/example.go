@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"libpurb/libpurb"
+	"go.dedis.ch/libpurb/libpurb"
 
 	"go.dedis.ch/kyber/v3/group/curve25519"
 	"go.dedis.ch/kyber/v3/util/key"

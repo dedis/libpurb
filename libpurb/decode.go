@@ -5,9 +5,9 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"errors"
-	"libpurb"
 
 	"go.dedis.ch/kyber/v3"
+	"go.dedis.ch/libpurb"
 )
 
 // Decode takes a PURB blob and a recipient info (suite+KeyPair) and extracts the payload

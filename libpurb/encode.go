@@ -4,12 +4,12 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/binary"
-	"libpurb"
 	"sort"
 	"strconv"
 
 	"go.dedis.ch/kyber/v3/util/key"
 	"go.dedis.ch/kyber/v3/util/random"
+	"go.dedis.ch/libpurb"
 )
 
 // Creates a PURB from some data and Recipients information
