@@ -1,4 +1,4 @@
-package purb
+package libpurb
 
 import "crypto/cipher"
 
@@ -22,7 +22,7 @@ type Purb struct {
 
 	// nonce used in both AEAD of entrypoints and payload.
 	// The same for different entrypoints as the keys are different.
-	// It is stored in the very beginning of the purb
+	// It is stored in the very beginning of the libpurb
 	nonce  []byte
 	header *Header
 

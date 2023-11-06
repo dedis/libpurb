@@ -1,4 +1,4 @@
-package purb
+package libpurb
 
 import (
 	"testing"

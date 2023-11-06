@@ -1,5 +1,5 @@
-// Package purb defines the logger.
-package purb
+// Package libpurb defines the logger.
+package libpurb
 
 import (
 	"os"
@@ -22,7 +22,7 @@ type Purb interface {
 	VisualRepresentation() string
 }
 
-// purb is using a global logger with some default parameters. It is disabled by
+// libpurb is using a global logger with some default parameters. It is disabled by
 // default and the level can be increased using an environment variable:
 //
 //	LLVL=trace go test ./...

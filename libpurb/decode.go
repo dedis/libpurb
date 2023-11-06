@@ -1,11 +1,11 @@
-package purb
+package libpurb
 
 import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/binary"
 	"errors"
-	"purb"
+	"libpurb"
 
 	"go.dedis.ch/kyber/v3"
 )
@@ -17,7 +17,7 @@ func (p *Purb) Decode(
 	suiteName := p.Recipients[0].SuiteName
 	suiteInfo := p.config.suiteInfoMap[suiteName]
 
-	purb.Logger.Info().Msgf("Attempting to decode using suite %v, len %v, positions %v",
+	libpurb.Logger.Info().Msgf("Attempting to decode using suite %v, len %v, positions %v",
 		suiteName,
 		suiteInfo.CornerstoneLength, suiteInfo.AllowedPositions)
 
@@ -40,7 +40,7 @@ func (p *Purb) Decode(
 		}
 		cornerstoneBytes := blob[startPos:endPos]
 
-		purb.Logger.Debug().Msgf("XORing in the bytes [%v:%v], value %v", startPos, endPos,
+		libpurb.Logger.Debug().Msgf("XORing in the bytes [%v:%v], value %v", startPos, endPos,
 			cornerstoneBytes)
 
 		for j := range cornerstoneBytes {
@@ -48,7 +48,7 @@ func (p *Purb) Decode(
 		}
 	}
 
-	purb.Logger.Debug().Msgf("Recovered cornerstone has value %v, len %v", cornerstone,
+	libpurb.Logger.Debug().Msgf("Recovered cornerstone has value %v, len %v", cornerstone,
 		len(cornerstone))
 
 	//Now that we have the SessionKey for our suite, calculate the shared SessionKey
@@ -62,9 +62,9 @@ func (p *Purb) Decode(
 	}
 	sharedSecret := KDF("", sharedBytes)
 
-	purb.Logger.Debug().Msgf("Recovered sharedbytes value %v, len %v", sharedBytes,
+	libpurb.Logger.Debug().Msgf("Recovered sharedbytes value %v, len %v", sharedBytes,
 		len(sharedBytes))
-	purb.Logger.Debug().Msgf("Recovered sharedsecret value %v, len %v", sharedSecret,
+	libpurb.Logger.Debug().Msgf("Recovered sharedsecret value %v, len %v", sharedSecret,
 		len(sharedSecret))
 
 	// Now we try to decrypt iteratively the entrypoints and check if the decrypted SessionKey works for AEAD of payload
@@ -111,12 +111,12 @@ func entrypointTrialDecode(
 				continue // it is not the correct entry point so we move one to try again
 			}
 
-			purb.Logger.Debug().Msgf("Recovering potential entrypoint [%v:%v], value %v",
+			libpurb.Logger.Debug().Msgf("Recovering potential entrypoint [%v:%v], value %v",
 				entrypointStartPos,
 				entrypointEndPos, data[entrypointStartPos:entrypointEndPos])
-			purb.Logger.Debug().Msgf("  Attempting decryption with sharedSecret %v",
+			libpurb.Logger.Debug().Msgf("  Attempting decryption with sharedSecret %v",
 				sharedSecret)
-			purb.Logger.Debug().Msgf("  yield %v", decrypted)
+			libpurb.Logger.Debug().Msgf("  yield %v", decrypted)
 
 			ok := verifyMAC(decrypted, blob)
 			if !ok {
@@ -125,7 +125,7 @@ func entrypointTrialDecode(
 
 			found, errorReason, message := payloadDecrypt(decrypted, data)
 
-			purb.Logger.Debug().Msgf("  found=%v, reason=%v, decrypted=%v", found, errorReason,
+			libpurb.Logger.Debug().Msgf("  found=%v, reason=%v, decrypted=%v", found, errorReason,
 				message)
 
 			if found {
@@ -169,7 +169,7 @@ func entrypointTrialDecodeSimplified(
 
 		found, errorReason, message := payloadDecrypt(decrypted, data)
 
-		purb.Logger.Debug().Msgf("  found=%v, reason=%v, decrypted=%v",
+		libpurb.Logger.Debug().Msgf("  found=%v, reason=%v, decrypted=%v",
 			found, errorReason, message)
 		if found {
 			return found, message, nil

@@ -1,4 +1,4 @@
-module purb
+module libpurb
 
 go 1.21
 

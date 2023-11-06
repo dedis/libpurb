@@ -1,4 +1,4 @@
-package purb
+package libpurb
 
 import (
 	"math"
@@ -7,7 +7,7 @@ import (
 )
 
 // Pads a message with random bytes as defined by Padmé.
-// 'other' is a number of additional bytes in purb (header, nonce, mac)
+// 'other' is a number of additional bytes in libpurb (header, nonce, mac)
 // that need to be taken into account when computing the amount of padding.
 func pad(msg []byte, other int) []byte {
 	var paddedMsg []byte

@@ -3,7 +3,8 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
-	"purb/purb"
+
+	"libpurb/libpurb"
 
 	"go.dedis.ch/kyber/v3/group/curve25519"
 	"go.dedis.ch/kyber/v3/util/key"
@@ -15,7 +16,7 @@ func main() {
 	suitesInfo := getDummySuiteInfo()
 	simplified := false // when "true", does not use hash tables (but linear mapping)
 
-	p := purb.NewPurb(
+	p := libpurb.NewPurb(
 		suitesInfo,
 		simplified,
 		random.New(),
@@ -54,11 +55,11 @@ func main() {
 	fmt.Println(hex.Dump(decrypted))
 }
 
-func getDummySuiteInfo() purb.SuiteInfoMap {
-	info := make(purb.SuiteInfoMap)
+func getDummySuiteInfo() libpurb.SuiteInfoMap {
+	info := make(libpurb.SuiteInfoMap)
 	cornerstoneLength := 32             // defined by Curve 25519
 	entryPointLength := 16 + 4 + 4 + 16 // 16-byte symmetric key + 2 * 4-byte offset positions + 16-byte authentication tag
-	info[curve25519.NewBlakeSHA256Curve25519(true).String()] = &purb.SuiteInfo{
+	info[curve25519.NewBlakeSHA256Curve25519(true).String()] = &libpurb.SuiteInfo{
 		AllowedPositions: []int{
 			12 + 0*cornerstoneLength,
 			12 + 1*cornerstoneLength,
@@ -70,13 +71,13 @@ func getDummySuiteInfo() purb.SuiteInfoMap {
 	return info
 }
 
-func createRecipients(n int) []purb.Recipient {
-	decs := make([]purb.Recipient, 0)
-	suites := []purb.Suite{curve25519.NewBlakeSHA256Curve25519(true)}
+func createRecipients(n int) []libpurb.Recipient {
+	decs := make([]libpurb.Recipient, 0)
+	suites := []libpurb.Suite{curve25519.NewBlakeSHA256Curve25519(true)}
 	for _, suite := range suites {
 		for i := 0; i < n; i++ {
 			pair := key.NewKeyPair(suite)
-			decs = append(decs, purb.Recipient{
+			decs = append(decs, libpurb.Recipient{
 				SuiteName:  suite.String(),
 				Suite:      suite,
 				PublicKey:  pair.Public,
