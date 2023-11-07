@@ -1,4 +1,4 @@
-module github.com/dedis/libpurb
+module go.dedis.ch/libpurb
 
 go 1.21
 
